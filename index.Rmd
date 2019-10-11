@@ -8,9 +8,9 @@ output:
 
 ## Abstract
 
-After looking over a few datasets from Nate Silver, data.gov, bigrquery and google. After exhausting many avenues of data I found a solid lead on the USDA website : (USDA.)[https://www.ers.usda.gov/data-products/county-level-data-sets/download-data/]
+I decided to look at the rates of unemployment to begin with, first looking over a few datasets from Nate Silver, data.gov, bigrquery and google. After exhausting many avenues of data I found a solid lead on the USDA website : (USDA.)[https://www.ers.usda.gov/data-products/county-level-data-sets/download-data/]
 
-Using this data I hope to find a deeper parallel between unemployment and the increase in automation technology.
+Using this data I hope to find a deeper parallel between unemployment and the increase in automation technology. If a parallel is drawn, further projections on the coming unemployment crisis may be able to spur more governing bodies to take the needs of the workers and citizenry more seriously.
 
 ***
 ### 1. Discovery and Data Preparation
@@ -19,15 +19,155 @@ Using this data I hope to find a deeper parallel between unemployment and the in
 The first thing to be done is to load the libraries that we will be using during our investigation of the data.
 
 ```{r}
-
+library("tidyverse")
+library("tidyr")
+library("dplyr")
+library("readr")
+library("stringr")
+library("readxl")
 ```
 
-The second thing is to import the data from the USDA government website.
+The second thing is to import the data from the USDA government website so that we can go over it and make it Tidy.
 
 ```{r}
-income_ineq <- read_excel("~/Downloads/Unemployment.xls")
+Unemployment <- read_excel("~/Downloads/Unemployment.xls")
 ```
-Provide a one-sentence introduction with what is covered by the first deliverable along with a link to another html page that gives the details.
+
+This data is incredibly wide, and although they are unique, they are a repeating pattern of four yearly data sets. We will be reducing this down into our four categorical factors and our four continuous.
+
+>Categorical : FIPS, State, Area_name, year
+>
+>Continuous  : civilian_labor, employed, unemployed, unemployment_rate
+
+We will do this first by selecting the identifying information with the year in range (2007).
+
+```{r}
+clean_unemp <- select(Unemployment, 1,2,3,7,8,9,10)
+```
+
+We have the first year in place, but it is only in the title of the continuous data sets we have. So we need to add a year.
+
+```{r}
+clean_unemp$year = 2007
+```
+
+We need to change the data, because currently it looks like this :
+```{r}
+print(clean_unemp)
+
+```
+
+We will be folding all the data under the current categorical (Civilian_labr_force_2007, Employed_2007, etc) and we can't have that year staying the same, and in fact let's clean up the rest of the names.
+
+```{r}
+colnames(clean_unemp)[colnames(clean_unemp) == "State"] <- "state"
+colnames(clean_unemp)[colnames(clean_unemp) == "Area_name"] <- "county"
+colnames(clean_unemp)[colnames(clean_unemp) == "Civilian_labor_force_2007"] <- "civilian_labor"
+colnames(clean_unemp)[colnames(clean_unemp) == "Employed_2007"] <- "employed"
+colnames(clean_unemp)[colnames(clean_unemp) == "Unemployed_2007"] <- "unemployed"
+colnames(clean_unemp)[colnames(clean_unemp) == "Unemployment_rate_2007"] <- "unemployment_rate"
+
+```
+
+With this done, now the dataframe clean_unemp looks like this :
+
+```{r}
+print(clean_unemp)
+```
+
+With this solid base, we can continue to import by adding dataframes onto this. We will have to do this for each year. We can do this through some simple scripting.
+
+```{r}
+col = 11
+
+for (n_year in 2008:2017){
+  col2 = col+1
+  col3 = col+2
+  col4 = col+3
+  temp_unemp <- select(Unemployment,1,2,3,col,col2,col3,col4)
+  colnames(temp_unemp)[2] = "state"
+  colnames(temp_unemp)[3] = "county"
+  colnames(temp_unemp)[4] = "civilian_labor"
+  colnames(temp_unemp)[5] = "employed"
+  colnames(temp_unemp)[6] = "unemployed"
+  colnames(temp_unemp)[7] = "unemployment_rate"
+  temp_unemp$year=n_year
+  clean_unemp <- rbind(clean_unemp, temp_unemp)
+  col = col4+1
+}
+
+```
+
+With this script run, we have created a more searchable dataframe. Where previously there had been 3,275 rows, now we have...
+
+```{r}
+print(clean_unemp)
+```
+
+*36,025* rows. All with the year their specific data is measured into, and a comparable county. This allows us to compare based off of State, County and Year or any of the other data sets. This is valuable, as our dataframe is now only eight wide, where it had been fifty six wide before. 
+
+
+A good example of this can be shown here in a graph, something we could not have done easily before we can now plot out with ggplot. We will first enable ggplot2 to allow us to flex some graphical prowess.
+
+```{r}
+library("ggplot2")
+```
+
+We have a yearly seperation of data, and this gives us the ability to hone our focus onto a location, and a measurement (civilian_labor, employed, unemployed, unemployment_rate) with a year range.
+
+Let's focus in on Butler County, Alabama. We're going to create a tibble to hold the data with unique year values.
+
+```{r}
+butler_county <- clean_unemp[clean_unemp$county == 'Butler County, AL',]
+```
+
+We have created a tibble named butler_county, this means that we can focus solely upon the data over the years in Butler County, AL. We're going to put the tibble into a plot variable so that we can act on it directly without having to repeat code that may be confusing.
+
+
+```{r}
+butler_plot <- ggplot(butler_county, aes(x=year, y=unemployment_rate, label=unemployment_rate))
+```
+
+Now that it is in an object that we can manipulate more easily, we will walk through three different types of graphs. First, we will apply it to a geometric line *(geom_line())*.
+
+***
+
+```{r}
+butler_plot + geom_line()
+```
+
+This gives us some information, but it is hard to differentiate between the years. Although it gives us a flow and an estimated "peak" of unemployment in approximately 2008, which would make sense given our historical understanding of the Mortage bubble.
+
+Now let's take a look at geom_step(), which will give us a stronger differentiation between years.
+
+***
+
+```{r}
+butler_plot + geom_step()
+```
+
+This also gives us a much better understanding, we can see the decrease per year, but in the declining years between 2010 and 2015 it is hard to tell how much it is decreasing in relation to the previous year. I think the better graph will be something with color and bars. In addition to this placing the value in the bar will give us quick access instead of having to compare it to the Y-axis.
+
+***
+
+```{r}
+butler_plot + geom_bar(stat = "identity", color = "Blue", fill="light blue") + geom_text(size = 3, position = position_stack(vjust = 0.5))
+```
+
+
+Once we draw in a secondary data set on the increase in automation in technology we can see how these compare to each other. We will need to reduce cohort data (such as the mortage bubble crisis) and we can probably do that by looking at the standard deviation from the United States average.
+
+```{r}
+usa_data <- clean_unemp[clean_unemp$county == 'United States',]
+usa_plot <- ggplot(usa_data, aes(x=year, y=unemployment_rate, label=unemployment_rate))
+```
+```{r}
+usa_plot + geom_bar(stat = "identity", color = "Blue", fill="light blue") + geom_text(size = 3, position = position_stack(vjust = 0.5))
+```
+
+***
+***
+Above we can see the country wide average. This is a good baseline that we can then focus in further on.
 
 ### 2. Model Planning and Building
 
