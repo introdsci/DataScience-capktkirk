@@ -8,7 +8,7 @@ output:
 
 ## Abstract
 
-I decided to look at the rates of unemployment to begin with, first looking over a few datasets from Nate Silver, data.gov, bigrquery and google. After exhausting many avenues of data I found a solid lead on the USDA website : (USDA.)[https://www.ers.usda.gov/data-products/county-level-data-sets/download-data/]
+I decided to look at the rates of unemployment to begin with, first looking over a few datasets from Nate Silver, data.gov, bigrquery and google. After exhausting many avenues of data I found a solid lead on the USDA website : [USDA.](https://www.ers.usda.gov/data-products/county-level-data-sets/download-data/)
 
 Using this data I hope to find a deeper parallel between unemployment and the increase in automation technology. If a parallel is drawn, further projections on the coming unemployment crisis may be able to spur more governing bodies to take the needs of the workers and citizenry more seriously.
 
@@ -30,7 +30,7 @@ library("readxl")
 The second thing is to import the data from the USDA government website so that we can go over it and make it Tidy.
 
 ```{r}
-Unemployment <- read_excel("~/Downloads/Unemployment.xls")
+Unemployment <- read_excel("Unemployment.xls")
 ```
 
 This data is incredibly wide, and although they are unique, they are a repeating pattern of four yearly data sets. We will be reducing this down into our four categorical factors and our four continuous.
