@@ -1,6 +1,6 @@
 ---
-title: " " #replace the title with something short and catchy to represent your project
-subtitle: "____'s Data Science Portfolio" #replace blank with your name
+title: "Unemployment Analysis by County"
+subtitle: "Kyle Kirk's Data Science Portfolio" #replace blank with your name
 output:
   html_document:
     df_print: paged
@@ -8,10 +8,25 @@ output:
 
 ## Abstract
 
-In under 250 words give a brief summary of the project so far.
+After looking over a few datasets from Nate Silver, data.gov, bigrquery and google. After exhausting many avenues of data I found a solid lead on the USDA website : (USDA.)[https://www.ers.usda.gov/data-products/county-level-data-sets/download-data/]
 
+Using this data I hope to find a deeper parallel between unemployment and the increase in automation technology.
+
+***
 ### 1. Discovery and Data Preparation
+***
 
+The first thing to be done is to load the libraries that we will be using during our investigation of the data.
+
+```{r}
+
+```
+
+The second thing is to import the data from the USDA government website.
+
+```{r}
+income_ineq <- read_excel("~/Downloads/Unemployment.xls")
+```
 Provide a one-sentence introduction with what is covered by the first deliverable along with a link to another html page that gives the details.
 
 ### 2. Model Planning and Building
