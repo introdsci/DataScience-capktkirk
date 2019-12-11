@@ -128,21 +128,28 @@ summary(corr_set4)
 
 
 These sets show that there are no correlations, but they provide an interesting trend in the higher education level the less likely a drug death (Although that could be caused by those with the money to pursue their Masters having a better social network or better stability.)
+
+# GRAPHS :
+
+## High School
 ```{r}
 hs_predict <- data.frame(hs_drug_predict=predict(corr_set1, hs_combined_dataset), hs_grad=hs_combined_dataset$total)
 ggplot(data=hs_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = hs_predict, aes(x=hs_drug_predict, y=hs_grad))
 
 ```
 
+## Associates :
 ```{r}
 aa_predict <- data.frame(aa_drug_predict=predict(corr_set1, aa_combined_dataset), aa_grad=aa_combined_dataset$total)
 ggplot(data=aa_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = aa_predict, aes(x=aa_drug_predict, y=aa_grad))
 ```
+## Bachleors :
 ```{r}
 ba_predict <- data.frame(ba_drug_predict=predict(corr_set1, ba_combined_dataset), ba_grad=ba_combined_dataset$total)
 ggplot(data=ba_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = ba_predict, aes(x=ba_drug_predict, y=ba_grad))
 ```
 
+## Masters :
 ```{r}
 ma_predict <- data.frame(ma_drug_predict=predict(corr_set1, ma_combined_dataset), ma_grad=ma_combined_dataset$total)
 ggplot(data=ma_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = ma_predict, aes(x=ma_drug_predict, y=ma_grad))
