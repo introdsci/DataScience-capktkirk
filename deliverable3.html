@@ -1664,7 +1664,9 @@ summary {
 <div id="summary" class="section level2">
 <h2><strong>Summary:</strong></h2>
 <p>This was a really good deliverable that seemed to very nicely build off of your first part. I would suggest for the future keep doing what you are doing and maybe look into the correlation between job opportunities and employment. This might be useful in figuring out if the region is part of the limitations or is effecting the results.</p>
-<p>##Rework</p>
+</div>
+<div id="rework" class="section level2">
+<h2>Rework</h2>
 <p>Given the information returned from Reese, I decided to follow his suggestions. I’ve adjusted the second deliverable to combine more chunks of code and combine the explanations together.</p>
 <p>The concept of job opportunities and employment is a good one, and that will require another dataset. There is no solid statistic on open jobs county by county, or United states, but we had a third dataset in the second deliverables. This may be the opportunity to focus on it more, there is a dataset from National Center for (Education Statistics)[<a href="https://nces.ed.gov/programs/digest/d18/tables/dt18_104.20.asp" class="uri">https://nces.ed.gov/programs/digest/d18/tables/dt18_104.20.asp</a>]</p>
 <p>We will clean the data after taking it, turn it into a tibble. We’ll take only the data from combined male/female ratio’s. We’ll change the names of the columns into human readable forms, and split them by the racial categories in the excel spreadsheet. We’ll also be adding a US Average column.</p>
@@ -1737,7 +1739,9 @@ aa_combined_dataset &lt;- left_join(combined_dataset, aa_edu, by=&quot;year&quot
 ba_combined_dataset &lt;- left_join(combined_dataset, ba_edu, by=&quot;year&quot;)
 ma_combined_dataset &lt;- left_join(combined_dataset, ma_edu, by=&quot;year&quot;)</code></pre>
 <p>We need to create a solid set of linear regressions, so we will split the levels of education into their own models.</p>
-<p>##High School :</p>
+</div>
+<div id="high-school" class="section level2">
+<h2>High School :</h2>
 <pre class="r"><code>corr_set1 &lt;- lm(data=hs_combined_dataset, formula=unemployed~drug_related_deaths_percent+total)
 summary(corr_set1)</code></pre>
 <pre><code>## 

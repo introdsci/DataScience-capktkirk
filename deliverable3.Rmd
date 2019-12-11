@@ -47,7 +47,7 @@ After the peer review we did in class on 10/05, Reese Tresendez had this to say 
   This was a really good deliverable that seemed to very nicely build off of your first part. I would suggest for the future keep doing what you are doing and maybe look into the correlation between job opportunities and employment. This might be useful in figuring out if the region is part of the limitations or is effecting the results.
 
 
-##Rework
+## Rework
 
   Given the information returned from Reese, I decided to follow his suggestions. I've adjusted the second deliverable to combine more chunks of code and combine the explanations together.
   
@@ -100,7 +100,7 @@ ma_combined_dataset <- left_join(combined_dataset, ma_edu, by="year")
 
 We need to create a solid set of linear regressions, so we will split the levels of education into their own models.
 
-##High School :
+## High School :
 
 ```{r}
 corr_set1 <- lm(data=hs_combined_dataset, formula=unemployed~drug_related_deaths_percent+total)
