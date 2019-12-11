@@ -1,13 +1,4 @@
----
-title: "Education Analysis by County"
-subtitle: "Kyle Kirk's Data Science Portfolio"
-output:
-  html_document:
-    df_print: paged
----
-
-This builds upon the first part, from [`insights.Rmd`](insights.html)
-```{r echo=FALSE, message=FALSE, error=FALSE, warning=FALSE, results='hide'}
+## ----echo=FALSE, message=FALSE, error=FALSE, warning=FALSE, results='hide'----------------------------
 include <- function(library_name){
   if( !(library_name %in% installed.packages()) )
     install.packages(library_name) 
@@ -16,22 +7,13 @@ include <- function(library_name){
 include("tidyverse")
 include("knitr")
 include("xlsx")
-purl("index.Rmd", output = "part1.r") # produces r source from rmd
+purl("deliverable1.Rmd", output = "part1.r") # produces r source from rmd
 source("part1.r") # executes the source
 options(scipen=999)
-```
 
-In the first section we used tidyverse to bring in unemployment data by county and state. The code above reruns the code so that we can use it for further comparison to our next dataset. Initially I was invetigating the correlation between Automation and Unemployment, unfortunately the current data on automation is obfuscated by companies that do not want to show the actual numbers of how many automatic tellers or how many jobs are being phased out.
 
-Instead, I will focus on unemployment and education. I want to see if there is a correlation between unemployment and rates of education on a county level. We'll start with reading in an excel spreadsheet.
-
-```{r}
+## -----------------------------------------------------------------------------------------------------
 Education <- read_excel("Education.xls")
-```
-
-The data is not very clean, so I'm going to remove sections that have information that don't pertain to what we want to compare. The names aren't clean and actually contain two sets of information, the category of education and the decade it was measured.
-
-```{r}
 eduLevelsbyCounty <- select(Education, 2, 3, 8:47)
 
 colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Area name"] <- "area_name"
@@ -78,28 +60,20 @@ colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Percent of adults wi
 colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Percent of adults with a high school diploma only, 2013-17"] <- "per_cent_HS_Diploma, 2013-17"
 colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Percent of adults completing some college (1-3 years), 2013-17"] <- "per_cent_Some_College, 2013-17"
 colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Percent of adults completing four years of college or higher, 2013-17"] <- "per_cent_BA_or_more, 2013-17"
-```
 
-The data is two different measurements of data, one is raw numbers and the other is a percentage. Both are useful, but they shouldn't be contained in the same table.
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 whole_nums_edu_levels <- select(eduLevelsbyCounty, 1:6, 11:14, 19:22, 27:30, 35:38)
 percents_edu_levels <- select(eduLevelsbyCounty, 1:2, 7:10, 15:18, 23:26, 31:34, 39:42)
-```
 
-In the first deliverable I focused on a single county to prove the concept, so I'll focus on the same county so that we can draw correlation.
-
-```{r}
 nums_USA <- whole_nums_edu_levels %>%
   filter(State == "US") 
 
 percents_USA <- percents_edu_levels %>%
   filter(State == "US")
-```
 
-The tibbles are not clean yet, as the headers contain both the type of data that is being measured and the decade. We need to separate them.
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 nums_df <- nums_USA %>% pivot_longer(cols=c(3:ncol(nums_USA)) )
 
 nums_df <- nums_df %>% separate(name, into=c("name", "year"), sep=", ")
@@ -107,102 +81,46 @@ nums_df <- nums_df %>% separate(name, into=c("name", "year"), sep=", ")
 percents_df <- percents_USA %>% pivot_longer(cols=c(3:ncol(percents_USA)) )
 
 percents_df <- percents_df %>% separate(name, into=c("name", "year"), sep=", ")
-```
 
-
-Plot
-
-```{r}
 percents<-ggplot(percents_df, aes(x=year, y=value, group=name, color=name)) + scale_y_continuous(labels = scales::number_format(accuracy = 1)) +
   geom_line()
 
-print(percents)
-```
-
-Lets make a data set from unemployment and focus on the US as a whole dataset.
-
-```{r}
 USA_county <- clean_unemp[clean_unemp$county == 'United States',]
 USA_county <- USA_county[3:8]
-colnames(USA_dd)[colnames(USA_dd) == "Year"] <- "year"
-```
-
-Looking at this data, unfortunately it is decade by decade, and we can break it down to find more correlation decade by decade. This will be useful perhaps later, but right now we're going to focus on our third data set. Which will be 
 
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 drug_deaths <- read_excel("drug_induced_deaths.xlsx")
-```
-
-We're going to sum up all the data so that we can be comparing the data for United States yearly with the unemployment data. We can also use this to compare state to state.
-
-
-```{r}
 drug_deaths_1999 <- drug_deaths[drug_deaths$Year == '1999',]
-```
-
-This allows us to focus on a single year and that allows us to compare to our Unemployment Data from the previous section.
-
-```{r}
 drug_deaths_1999_sum <- apply(drug_deaths_1999[,3], 2, sum)
 print(drug_deaths_1999_sum)
-```
-This summation shows that it is working, but it would be labor intensive to do this individually per area. Let's create each individual years data.
 
-###Drug Related Deaths
-Having a proof of concept from above, we can now shrink the table and work on it.
 
-We need to create a smaller table that has just the data we want to access attached to it, for that we will simply select the data we want (deaths, year, and population), and sum them together.
-
-```{r}
+## -----------------------------------------------------------------------------------------------------
 USA_dd <- select(drug_deaths, 2:4)
 USA_dd <- USA_dd %>% group_by(Year) %>% summarise_each(funs(sum))
-```
+colnames(USA_dd)[colnames(USA_dd) == "Year"] <- "year"
 
-This is exactly what we want, but we need something else that will give us an idea if the deaths are significant to the population. We will create a new column on the USA_dd list.
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 USA_dd$percent <- USA_dd$Deaths/USA_dd$Population
-```
-With a percentage column created, we can print out that it is working to make sure that it is in the "Shape" that we want so we can further distill the information.
 
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 print(USA_dd)
 print(USA_county)
-```
-
-This is a much easier way to produce visual data that we can look at and intuit information about. With the data from education, and now the drug deaths we can combine these two datasets into one so that we can do some linear regression.
-
-Before we do this, we should make the "Deaths" and "percent" clear that these are based on drug overdoses or drug related deaths.
-We will change Deaths to drug_related_deaths_number, and percent to drug_related_deaths_percent.
-
-```{r}
 colnames(USA_dd)[colnames(USA_dd) == "Deaths"] <- "drug_related_deaths_number"
 colnames(USA_dd)[colnames(USA_dd) == "percent"] <- "drug_related_deaths_percent"
 print(USA_dd)
-```
 
 
-Now we can combine the datasets into a new one. We're going to be removing any data that is "NA" so that we can plot it, so we'll be removing the NA from the merged data sets.
-
-```{r}
+## -----------------------------------------------------------------------------------------------------
 combined_dataset <- merge(USA_dd, USA_county, by="year", all=TRUE)
 combined_dataset <- na.omit(combined_dataset)
-```
-
-Now we can print that out to make sure it looks the way we want it to be.
-
-```{r}
 print(combined_dataset)
-```
 
 
-###Modeling :
-
-Now, with the datacombined into a single tibble that we can operate on we can do some modeling. To do so we'll need to turn everything into continous data for graphing.
-
-```{r}
+## -----------------------------------------------------------------------------------------------------
 as.numeric(combined_dataset$year)
 as.numeric(combined_dataset$drug_related_deaths_number)
 as.numeric(combined_dataset$Population)
@@ -211,29 +129,20 @@ as.numeric(combined_dataset$civilian_labor)
 as.numeric(combined_dataset$employed)
 as.numeric(combined_dataset$unemployed)
 as.numeric(combined_dataset$unemployment_rate)
-```
-We have now made all the datasets so that we can work on them. This is all the continuous data that we will be working on and given that we have datasets to work on, we can begin modeling.
 
-```{r}
+
+## -----------------------------------------------------------------------------------------------------
 corr_set <- lm(data=combined_dataset, formula=unemployed~drug_related_deaths_number+drug_related_deaths_percent+civilian_labor)
-```
 
-We've created a linear regression model so that we can see if there is any correlation between the data sets we've choosen.
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 summary(corr_set)
-```
 
-We can conclude from this that there is no significant p value for data correlation, but we will model it with ggplot to show a more intuitive view to draw our negative correlation.
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 prediction <-data.frame(drug_predict = predict(corr_set, combined_dataset), deaths=combined_dataset$drug_related_deaths_number)
-```
 
-We've created a plot variable that we can work on.
 
-```{r}
+## -----------------------------------------------------------------------------------------------------
 ggplot(data=combined_dataset, aes(x=unemployed,y=drug_related_deaths_number)) + geom_point(color='blue') + geom_line(color='red', data = prediction, aes(x=drug_predict, y=deaths))
-```
 
-As we can see, this plot does not show any correlation what so ever. We can use this conclusion to guide our understanding forward to try to find other datasets that give us better understanding to what is a good predictor of drug related deaths. If we can find a dataset for education that isn't a decade to decade measurement, we could tie that into another correlation model.

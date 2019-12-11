@@ -169,11 +169,3 @@ usa_plot + geom_bar(stat = "identity", color = "Blue", fill="light blue") + geom
 ***
 Above we can see the country wide average. This is a good baseline that we can then focus in further on.
 
-### 2. Model Planning and Building
-
-Coming soon...
-
-### 3. Results and Operationalization
-
-Coming soon...
-

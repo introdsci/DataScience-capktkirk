@@ -13,8 +13,8 @@ Using the data from Education, Unemployment and Drug Deaths in the United States
 Data taken from the Census on Unemployment Data : <a href="deliverable1.html" title="Deliverable 1">Deliverable 1</a>
 
 ##2) Model Planning and Building
-Data taken from the Education and Drug Deaths also from Census and the CDC <a href="deliverable2.html" title="Deliverable 1">Deliverable 2</a>
+Data taken from the Education and Drug Deaths also from Census and the CDC <a href="deliverable2.html" title="Deliverable 2">Deliverable 2</a>
 
 ##3) Results and Operationalization
 
-Coming soon...
+Finishing up the data and finding out how to operationalize the data. <a href="deliverable3.html" title="Deliverable 2">Deliverable 3<a/>
