@@ -16,6 +16,7 @@ include <- function(library_name){
 include("tidyverse")
 include("knitr")
 include("xlsx")
+gc()
 purl("deliverable1.Rmd", output = "part1.r") # produces r source from rmd
 source("part1.r") # executes the source
 options(scipen=999)

@@ -7,6 +7,9 @@ output:
 ---
 
 We will work on the third deliverable, but to do so we need to bring in everything from the first and second. We can do this in the same fashion that we did in the previous deliverable by incorporating everything from the second.
+```{r GlobalOptions, echo=FALSE}
+options(knitr.duplicate.label = 'allow')
+```
 
 ```{r echo=FALSE, message=FALSE, error=FALSE, warning=FALSE, results='hide'}
 include <- function(library_name){
