@@ -54,7 +54,7 @@ After the peer review we did in class on 10/05, Reese Tresendez had this to say 
 County_Education <- read_excel("Education2.xls")
 County_Education <- as_tibble(County_Education)
 County_Education <- select(County_Education, 1, 5, 8, 11, 17, 20, 23, 26)
-colnames(County_Education)[colnames(County_Education) == "Sex, selected level of educational attainment, and year"] <- "edu_level"
+colnames(County_Education)[colnames(County_Education) == "Sex, selected level of educational attainment, and year"] <- "year"
 
 colnames(County_Education)[2] <- "white"
 colnames(County_Education)[3] <- "black"
@@ -63,15 +63,91 @@ colnames(County_Education)[5] <- "asian"
 colnames(County_Education)[6] <- "pac_islander"
 colnames(County_Education)[7] <- "indigenous"
 colnames(County_Education)[8] <- "two_plus"
-newCountyData <- subset(County_Education, !is.na(edu_level))
-```
-
-```{r}
+newCountyData <- subset(County_Education, !is.na(year))
 newCountyData[, 2:8] <- sapply(newCountyData[,2:8], as.numeric)
+newCountyData <- newCountyData %>%
+  replace(is.na(.), 0) %>%
+  mutate(total = rowSums(.[2:8])/7)
+edu_levels_raw <- newCountyData[3:60, c(1,9)]
+df2 <- edu_levels_raw %>%
+  mutate(year = str_remove_all(year, "\\.(?!\\d{2,}$)") %>%
+           str_replace_all(",", "."))
+```
+
+The data has been cleaned, but we still need to do more. While the values are more readable, we do need to separate it so that we can do some linear regression models on it.
+
+```{r}
+df2$year <- as.numeric(df2$year)
+highschool_edu <- df2[2:15, 1:2]
+add_column(highschool_edu, edu_level = "HS or more.", .after = "year")
+aa_edu <- df2[17:30, 1:2]
+add_column(aa_edu, edu_level = "AA/AS or more.", .after = "year")
+ba_edu <- df2[32:45, 1:2]
+add_column(ba_edu, edu_level = "BA/BS or more", .after = "year")
+ma_edu <- df2[47:58, 1:2]
+add_column(ma_edu, edu_level = "MA/MS or more.", .after = "year")
+hs_combined_dataset <- left_join(combined_dataset, highschool_edu, by = "year")
+aa_combined_dataset <- left_join(combined_dataset, aa_edu, by="year")
+ba_combined_dataset <- left_join(combined_dataset, ba_edu, by="year")
+ma_combined_dataset <- left_join(combined_dataset, ma_edu, by="year")
+```
+
+
+We need to create a solid set of linear regressions, so we will split the levels of education into their own models.
+
+##High School :
+
+```{r}
+corr_set1 <- lm(data=hs_combined_dataset, formula=unemployed~drug_related_deaths_percent+total)
+summary(corr_set1)
+```
+
+##Associates :
+```{r}
+corr_set2 <- lm(data=aa_combined_dataset, formula=unemployed~drug_related_deaths_number+total)
+summary(corr_set2)
+```
+
+##Bachleors : 
+```{r}
+corr_set3 <- lm(data=ba_combined_dataset, formula=unemployed~drug_related_deaths_number+total)
+summary(corr_set3)
+```
+
+##Masters :
+```{r}
+corr_set4 <- lm(data=ma_combined_dataset, formula=unemployed~drug_related_deaths_number+total)
+summary(corr_set4)
+```
+
+
+
+These sets show that there are no correlations, but they provide an interesting trend in the higher education level the less likely a drug death (Although that could be caused by those with the money to pursue their Masters having a better social network or better stability.)
+```{r}
+hs_predict <- data.frame(hs_drug_predict=predict(corr_set1, hs_combined_dataset), hs_grad=hs_combined_dataset$total)
+ggplot(data=hs_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = hs_predict, aes(x=hs_drug_predict, y=hs_grad))
+
 ```
 
 ```{r}
-newCountyData %>%
-  replace(is.na(.), 0) %>%
-  mutate(sum = rowSums(.[2:8]))
+aa_predict <- data.frame(aa_drug_predict=predict(corr_set1, aa_combined_dataset), aa_grad=aa_combined_dataset$total)
+ggplot(data=aa_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = aa_predict, aes(x=aa_drug_predict, y=aa_grad))
 ```
+```{r}
+ba_predict <- data.frame(ba_drug_predict=predict(corr_set1, ba_combined_dataset), ba_grad=ba_combined_dataset$total)
+ggplot(data=ba_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = ba_predict, aes(x=ba_drug_predict, y=ba_grad))
+```
+
+```{r}
+ma_predict <- data.frame(ma_drug_predict=predict(corr_set1, ma_combined_dataset), ma_grad=ma_combined_dataset$total)
+ggplot(data=ma_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='blue') + geom_line(color='red', data = ma_predict, aes(x=ma_drug_predict, y=ma_grad))
+```
+
+
+  We have the data showing that there isn't a strong correlation, but we do have a pattern that the higher the education a person attains the worse the P value is, which could be a correlation in itself. This would be something, along with perhaps socio-economic income that we could combine to get further understanding. 
+
+##Operationalization :
+
+  The best way we could follow through with this data is to increase the ability for individuals to pursue college, perhaps giving a stipend and making college subsidized by 15% of the countries military budget. We could have students commit to a year of community work in the area that they pursue their education in to get "returns" on the education if there is a push back.
+  
+  After ten years, we would be able to see a generation who grew up from teenagers into adults without the pressure of having to apply for scholarships, or work during college and we could follow through with the amount of drug deaths (not use, because responsible use of stimulants or depressents have been a part of society forever and any prohibition of it has always failed) that follow the concurrent generations and address the educational benefits or the adjustment of further study to see what other confounding factors arise.
