@@ -1,4 +1,4 @@
-## ----echo=FALSE, message=FALSE, error=FALSE, warning=FALSE, results='hide'--------------------------------------------------
+## ----echo=FALSE, message=FALSE, error=FALSE, warning=FALSE, results='hide'----
 include <- function(library_name){
   if( !(library_name %in% installed.packages()) )
     install.packages(library_name) 
@@ -12,7 +12,7 @@ source("part1.r") # executes the source
 options(scipen=999)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 Education <- read_excel("Education.xls")
 eduLevelsbyCounty <- select(Education, 2, 3, 8:47)
 
@@ -62,7 +62,7 @@ colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Percent of adults co
 colnames(eduLevelsbyCounty)[colnames(eduLevelsbyCounty) == "Percent of adults completing four years of college or higher, 2013-17"] <- "per_cent_BA_or_more, 2013-17"
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 whole_nums_edu_levels <- select(eduLevelsbyCounty, 1:6, 11:14, 19:22, 27:30, 35:38)
 percents_edu_levels <- select(eduLevelsbyCounty, 1:2, 7:10, 15:18, 23:26, 31:34, 39:42)
 
@@ -73,7 +73,7 @@ percents_USA <- percents_edu_levels %>%
   filter(State == "US")
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 nums_df <- nums_USA %>% pivot_longer(cols=c(3:ncol(nums_USA)) )
 
 nums_df <- nums_df %>% separate(name, into=c("name", "year"), sep=", ")
@@ -89,24 +89,24 @@ USA_county <- clean_unemp[clean_unemp$county == 'United States',]
 USA_county <- USA_county[3:8]
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 drug_deaths <- read_excel("drug_induced_deaths.xlsx")
 drug_deaths_1999 <- drug_deaths[drug_deaths$Year == '1999',]
 drug_deaths_1999_sum <- apply(drug_deaths_1999[,3], 2, sum)
 print(drug_deaths_1999_sum)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 USA_dd <- select(drug_deaths, 2:4)
 USA_dd <- USA_dd %>% group_by(Year) %>% summarise_each(funs(sum))
 colnames(USA_dd)[colnames(USA_dd) == "Year"] <- "year"
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 USA_dd$percent <- USA_dd$Deaths/USA_dd$Population
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 print(USA_dd)
 print(USA_county)
 colnames(USA_dd)[colnames(USA_dd) == "Deaths"] <- "drug_related_deaths_number"
@@ -114,13 +114,13 @@ colnames(USA_dd)[colnames(USA_dd) == "percent"] <- "drug_related_deaths_percent"
 print(USA_dd)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 combined_dataset <- merge(USA_dd, USA_county, by="year", all=TRUE)
 combined_dataset <- na.omit(combined_dataset)
 print(combined_dataset)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 as.numeric(combined_dataset$year)
 as.numeric(combined_dataset$drug_related_deaths_number)
 as.numeric(combined_dataset$Population)
@@ -131,18 +131,18 @@ as.numeric(combined_dataset$unemployed)
 as.numeric(combined_dataset$unemployment_rate)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 corr_set <- lm(data=combined_dataset, formula=unemployed~drug_related_deaths_number+drug_related_deaths_percent+civilian_labor)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(corr_set)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 prediction <-data.frame(drug_predict = predict(corr_set, combined_dataset), deaths=combined_dataset$drug_related_deaths_number)
 
 
-## ---------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ggplot(data=combined_dataset, aes(x=unemployed,y=drug_related_deaths_number)) + geom_point(color='blue') + geom_line(color='red', data = prediction, aes(x=drug_predict, y=deaths))
 

@@ -1,7 +1,9 @@
 ---
-author: "Kyle Kirk"
 title: "Deliverable 3"
-output: html_notebook
+author: "Kyle Kirk"
+output:
+  html_document:
+    df_print: paged
 ---
 
 We will work on the third deliverable, but to do so we need to bring in everything from the first and second. We can do this in the same fashion that we did in the previous deliverable by incorporating everything from the second.
@@ -23,22 +25,22 @@ options(scipen=999)
 
 After the peer review we did in class on 10/05, Reese Tresendez had this to say :
 
-##**Data Preparation:**
+## **Data Preparation:**
   The data was well organized and I there was emphasis multiple times with constant renaming of variables to keep the flow consistent and easy to follow. Overall very well done!
 
-##**Modeling:**
+## **Modeling:**
   The overall flow of modeling in this deliverable is very well done. The coloring looks nice and the graphs display exactly what I expected to see based on the explanation. My only suggestion within this section would be to print out less of the data as the actual data points are not as necessary as the visualization from a graph is what is important.
 
-##**R Proficiency:**
+## **R Proficiency:**
   From what I saw it seems like there was a lot of thought put into how to manipulate the data to make it work as intended. I have worked with this data set before and your use of R functions to make it manageable was very well done!
 
-##**Communication:**
+## **Communication:**
   There was a lot of small R blocks which were each explained in at least one sentence which made it very easy to follow the flow of the project. I would say the communication was almost over the top. Overall very well done, my only suggestion would be to lump more code together and give the same amount of detail when explaining a block as opposed to more of a single line.
 
-##**Critical Thinking:**
+## **Critical Thinking:**
   I believe that this project reflects your goal very well and I believe that based on the language alone that there was a lot of time put into this. You seemed to really understand the dataset and what it is providing and the overall results while may not have proved to be a correlation was very well presented.
 
-##**Summary:**
+## **Summary:**
   This was a really good deliverable that seemed to very nicely build off of your first part. I would suggest for the future keep doing what you are doing and maybe look into the correlation between job opportunities and employment. This might be useful in figuring out if the region is part of the limitations or is effecting the results.
 
 
@@ -102,19 +104,19 @@ corr_set1 <- lm(data=hs_combined_dataset, formula=unemployed~drug_related_deaths
 summary(corr_set1)
 ```
 
-##Associates :
+## Associates :
 ```{r}
 corr_set2 <- lm(data=aa_combined_dataset, formula=unemployed~drug_related_deaths_number+total)
 summary(corr_set2)
 ```
 
-##Bachleors : 
+## Bachleors : 
 ```{r}
 corr_set3 <- lm(data=ba_combined_dataset, formula=unemployed~drug_related_deaths_number+total)
 summary(corr_set3)
 ```
 
-##Masters :
+## Masters :
 ```{r}
 corr_set4 <- lm(data=ma_combined_dataset, formula=unemployed~drug_related_deaths_number+total)
 summary(corr_set4)
@@ -146,7 +148,7 @@ ggplot(data=ma_combined_dataset, aes(x=unemployed,y=total)) + geom_point(color='
 
   We have the data showing that there isn't a strong correlation, but we do have a pattern that the higher the education a person attains the worse the P value is, which could be a correlation in itself. This would be something, along with perhaps socio-economic income that we could combine to get further understanding. 
 
-##Operationalization :
+## Operationalization :
 
   The best way we could follow through with this data is to increase the ability for individuals to pursue college, perhaps giving a stipend and making college subsidized by 15% of the countries military budget. We could have students commit to a year of community work in the area that they pursue their education in to get "returns" on the education if there is a push back.
   
